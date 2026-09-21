@@ -1,0 +1,31 @@
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.production
+.env.staging
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Coverage
+coverage/
