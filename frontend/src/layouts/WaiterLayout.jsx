@@ -17,12 +17,16 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import LocalCafeIcon from '@mui/icons-material/LocalCafe';
 import LogoutIcon from '@mui/icons-material/Logout';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import MoneyOffIcon from '@mui/icons-material/MoneyOff';
 
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { label: 'New Sale', path: '/waiter/new-sale', icon: <AddCircleIcon /> },
-  { label: 'My Sales', path: '/waiter/my-sales', icon: <ReceiptIcon /> },
+  { label: 'New Sale',     path: '/waiter/new-sale',    icon: <AddCircleIcon /> },
+  { label: 'My Sales',     path: '/waiter/my-sales',    icon: <ReceiptIcon /> },
+  { label: 'Other Sales',  path: '/waiter/other-sales', icon: <StorefrontIcon /> },
+  { label: 'Unpaid',       path: '/waiter/unpaid',      icon: <MoneyOffIcon /> },
 ];
 
 export default function WaiterLayout() {
@@ -50,6 +54,10 @@ export default function WaiterLayout() {
             </Avatar>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+            <MenuItem disabled>
+              <Typography variant="body2">{user?.full_name}</Typography>
+            </MenuItem>
+            <Divider />
             <MenuItem onClick={logout}>
               <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
               Logout
@@ -58,7 +66,7 @@ export default function WaiterLayout() {
         </Toolbar>
       </AppBar>
 
-      {/* Page content */}
+      {/* Page content — extra bottom padding for the fixed nav bar */}
       <Box component="main" sx={{ flex: 1, p: 2, pb: 10, overflow: 'auto' }}>
         <Outlet />
       </Box>
@@ -76,9 +84,7 @@ export default function WaiterLayout() {
               icon={item.icon}
               component={Link}
               to={item.path}
-              sx={{
-                '&.Mui-selected': { color: 'primary.main' },
-              }}
+              sx={{ '&.Mui-selected': { color: 'primary.main' } }}
             />
           ))}
         </BottomNavigation>

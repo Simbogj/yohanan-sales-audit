@@ -12,6 +12,10 @@ const auditRoutes = require('./routes/audits');
 const reportRoutes = require('./routes/reports');
 const userRoutes = require('./routes/users');
 const dailyAuditRoutes = require('./routes/dailyAudit');
+const purchaseRoutes = require('./routes/purchases');
+const expenseRoutes = require('./routes/expenses');
+const otherSalesRoutes = require('./routes/otherSales');
+const unpaidSalesRoutes = require('./routes/unpaidSales');
 
 const app = express();
 
@@ -34,6 +38,10 @@ app.use('/api/audits', auditRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/daily-audit', dailyAuditRoutes);
+app.use('/api/purchases', purchaseRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/other-sales', otherSalesRoutes);
+app.use('/api/unpaid-sales', unpaidSalesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

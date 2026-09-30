@@ -10,6 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
 import Avatar from '@mui/material/Avatar';
@@ -26,19 +27,52 @@ import LocalCafeIcon from '@mui/icons-material/LocalCafe';
 import PeopleIcon from '@mui/icons-material/People';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import MoneyOffIcon from '@mui/icons-material/MoneyOff';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 import { useAuth } from '../context/AuthContext';
 
-const DRAWER_WIDTH = 240;
+const DRAWER_WIDTH = 248;
 
-const navItems = [
-  { label: 'Dashboard', path: '/owner/dashboard', icon: <DashboardIcon /> },
-  { label: 'Sales Audit', path: '/owner/audit', icon: <FactCheckIcon /> },
-  { label: 'All Sales', path: '/owner/sales', icon: <ReceiptLongIcon /> },
-  { label: 'Daily Report', path: '/owner/report', icon: <BarChartIcon /> },
-  { label: 'Products', path: '/owner/products', icon: <LocalCafeIcon /> },
-  { label: 'Users', path: '/owner/users', icon: <PeopleIcon /> },
+const navGroups = [
+  {
+    label: 'Overview',
+    items: [
+      { label: 'Dashboard',     path: '/owner/dashboard', icon: <DashboardIcon /> },
+    ],
+  },
+  {
+    label: 'Sales',
+    items: [
+      { label: 'Sales Audit',   path: '/owner/audit',       icon: <FactCheckIcon /> },
+      { label: 'All Sales',     path: '/owner/sales',       icon: <ReceiptLongIcon /> },
+      { label: 'Other Sales',   path: '/owner/other-sales', icon: <StorefrontIcon /> },
+      { label: 'Unpaid Sales',  path: '/owner/unpaid',      icon: <MoneyOffIcon /> },
+    ],
+  },
+  {
+    label: 'Finance',
+    items: [
+      { label: 'Purchases',     path: '/owner/purchases',   icon: <ShoppingCartIcon /> },
+      { label: 'Expenses',      path: '/owner/expenses',    icon: <ReceiptIcon /> },
+      { label: 'Profit Report', path: '/owner/profit',      icon: <AssessmentIcon /> },
+      { label: 'Daily Report',  path: '/owner/report',      icon: <BarChartIcon /> },
+    ],
+  },
+  {
+    label: 'Admin',
+    items: [
+      { label: 'Products',      path: '/owner/products',    icon: <LocalCafeIcon /> },
+      { label: 'Users',         path: '/owner/users',       icon: <PeopleIcon /> },
+    ],
+  },
 ];
+
+// Flat list used for AppBar title lookup
+const allNavItems = navGroups.flatMap((g) => g.items);
 
 export default function OwnerLayout() {
   const { user, logout } = useAuth();
@@ -50,9 +84,9 @@ export default function OwnerLayout() {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const drawerContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
       {/* Logo / Brand */}
-      <Box sx={{ p: 3, bgcolor: 'primary.main', color: 'white' }}>
+      <Box sx={{ p: 3, bgcolor: 'primary.main', color: 'white', flexShrink: 0 }}>
         <Box display="flex" alignItems="center" gap={1.5}>
           <LocalCafeIcon sx={{ fontSize: 28 }} />
           <Box>
@@ -68,53 +102,73 @@ export default function OwnerLayout() {
 
       <Divider />
 
-      {/* Nav Links */}
-      <List sx={{ flex: 1, pt: 1 }}>
-        {navItems.map((item) => {
-          const active = location.pathname === item.path;
-          return (
-            <ListItem key={item.path} disablePadding>
-              <ListItemButton
-                component={Link}
-                to={item.path}
-                onClick={() => setDrawerOpen(false)}
-                sx={{
-                  mx: 1,
-                  borderRadius: 2,
-                  mb: 0.5,
-                  bgcolor: active ? 'primary.main' : 'transparent',
-                  color: active ? 'white' : 'text.primary',
-                  '&:hover': {
-                    bgcolor: active ? 'primary.dark' : 'action.hover',
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: 'inherit', minWidth: 36 }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: '0.9rem' }} />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
+      {/* Grouped Nav Links */}
+      {navGroups.map((group) => (
+        <List
+          key={group.label}
+          dense
+          subheader={
+            <ListSubheader
+              sx={{
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'text.disabled',
+                lineHeight: '2.2',
+                bgcolor: 'transparent',
+              }}
+            >
+              {group.label}
+            </ListSubheader>
+          }
+        >
+          {group.items.map((item) => {
+            const active = location.pathname === item.path;
+            return (
+              <ListItem key={item.path} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to={item.path}
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    mx: 1,
+                    borderRadius: 2,
+                    mb: 0.3,
+                    bgcolor: active ? 'primary.main' : 'transparent',
+                    color: active ? 'white' : 'text.primary',
+                    '&:hover': {
+                      bgcolor: active ? 'primary.dark' : 'action.hover',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ color: 'inherit', minWidth: 34 }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{ fontSize: '0.875rem' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      ))}
 
+      <Box sx={{ flex: 1 }} />
       <Divider />
 
       {/* User info */}
-      <Box sx={{ p: 2 }}>
-        <Typography variant="caption" color="text.secondary">
-          Signed in as
-        </Typography>
-        <Typography variant="body2" fontWeight={600}>
-          {user?.full_name}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          Owner
-        </Typography>
+      <Box sx={{ p: 2, flexShrink: 0 }}>
+        <Typography variant="caption" color="text.secondary">Signed in as</Typography>
+        <Typography variant="body2" fontWeight={600}>{user?.full_name}</Typography>
+        <Typography variant="caption" color="text.secondary">Owner</Typography>
       </Box>
     </Box>
   );
+
+  const pageTitle = allNavItems.find((n) => n.path === location.pathname)?.label || 'Yohanan Coffee';
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -125,7 +179,12 @@ export default function OwnerLayout() {
           sx={{
             width: DRAWER_WIDTH,
             flexShrink: 0,
-            '& .MuiDrawer-paper': { width: DRAWER_WIDTH, boxSizing: 'border-box', borderRight: '1px solid', borderColor: 'divider' },
+            '& .MuiDrawer-paper': {
+              width: DRAWER_WIDTH,
+              boxSizing: 'border-box',
+              borderRight: '1px solid',
+              borderColor: 'divider',
+            },
           }}
         >
           {drawerContent}
@@ -136,9 +195,7 @@ export default function OwnerLayout() {
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
           ModalProps={{ keepMounted: true }}
-          sx={{
-            '& .MuiDrawer-paper': { width: DRAWER_WIDTH },
-          }}
+          sx={{ '& .MuiDrawer-paper': { width: DRAWER_WIDTH } }}
         >
           {drawerContent}
         </Drawer>
@@ -147,7 +204,11 @@ export default function OwnerLayout() {
       {/* Main content */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Top AppBar */}
-        <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'white', borderBottom: '1px solid', borderColor: 'divider' }}>
+        <AppBar
+          position="sticky"
+          elevation={0}
+          sx={{ bgcolor: 'white', borderBottom: '1px solid', borderColor: 'divider' }}
+        >
           <Toolbar>
             {isMobile && (
               <IconButton edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 2 }}>
@@ -155,7 +216,7 @@ export default function OwnerLayout() {
               </IconButton>
             )}
             <Typography variant="h6" fontWeight={600} color="text.primary" sx={{ flex: 1 }}>
-              {navItems.find((n) => n.path === location.pathname)?.label || 'Yohanan Coffee'}
+              {pageTitle}
             </Typography>
 
             <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -18,13 +18,21 @@ import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // If already logged in (e.g. back-button after login), redirect away immediately
+  useEffect(() => {
+    if (!loading && user) {
+      const dest = user.role === 'OWNER' ? '/owner/dashboard' : '/waiter/new-sale';
+      navigate(dest, { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,23 +41,24 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     setErrorMsg('');
 
     try {
-      const user = await login(username.trim(), password);
-      if (user.role === 'OWNER') {
-        navigate('/owner/dashboard', { replace: true });
-      } else {
-        navigate('/waiter/new-sale', { replace: true });
-      }
+      const loggedInUser = await login(username.trim(), password);
+      // Navigate immediately after login — user state is already set by login()
+      const dest = loggedInUser.role === 'OWNER' ? '/owner/dashboard' : '/waiter/new-sale';
+      navigate(dest, { replace: true });
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
       setErrorMsg(msg);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  // While checking stored session, show nothing (AuthProvider shows spinner anyway)
+  if (loading) return null;
 
   return (
     <Box
@@ -99,7 +108,7 @@ export default function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
               autoFocus
-              disabled={loading}
+              disabled={submitting}
               sx={{ mb: 2 }}
               inputProps={{ 'aria-label': 'Username' }}
             />
@@ -111,7 +120,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
-              disabled={loading}
+              disabled={submitting}
               sx={{ mb: 3 }}
               InputProps={{
                 endAdornment: (
@@ -134,10 +143,10 @@ export default function LoginPage() {
               variant="contained"
               fullWidth
               size="large"
-              disabled={loading}
+              disabled={submitting}
               sx={{ py: 1.5 }}
             >
-              {loading ? <CircularProgress size={22} color="inherit" /> : 'LOGIN'}
+              {submitting ? <CircularProgress size={22} color="inherit" /> : 'LOGIN'}
             </Button>
           </Box>
 
